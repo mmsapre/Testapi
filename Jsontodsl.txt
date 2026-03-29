@@ -1,0 +1,104 @@
+private String handleWhereClause(Map<String, Object> queryClause) {
+
+    StringBuilder where = new StringBuilder();
+
+    if (!queryClause.containsKey("bool")) {
+        return "";
+    }
+
+    Map<String, Object> bool = (Map<String, Object>) queryClause.get("bool");
+
+    if (!bool.containsKey("must")) {
+        return "";
+    }
+
+    List<Map<String, Object>> mustList =
+            (List<Map<String, Object>>) bool.get("must");
+
+    for (int i = 0; i < mustList.size(); i++) {
+
+        Map<String, Object> condition = mustList.get(i);
+
+        // =====================
+        // MATCH (=)
+        // =====================
+        if (condition.containsKey("match")) {
+
+            Map<String, Object> match =
+                    (Map<String, Object>) condition.get("match");
+
+            for (Map.Entry<String, Object> entry : match.entrySet()) {
+
+                String field = convertJsonPathToSql(entry.getKey());
+                Object value = entry.getValue();
+
+                where.append(field)
+                     .append(" = '")
+                     .append(value)
+                     .append("'");
+            }
+        }
+
+        // =====================
+        // BETWEEN
+        // =====================
+        else if (condition.containsKey("between")) {
+
+            Map<String, Object> between =
+                    (Map<String, Object>) condition.get("between");
+
+            String field = convertJsonPathToSql((String) between.get("field"));
+
+            String from = between.get("from").toString();
+            String to   = between.get("to").toString();
+
+            where.append(field)
+                 .append(" BETWEEN '")
+                 .append(from)
+                 .append("' AND '")
+                 .append(to)
+                 .append("'");
+        }
+
+        // =====================
+        // ADD AND
+        // =====================
+        if (i < mustList.size() - 1) {
+            where.append(" AND ");
+        }
+    }
+
+    return where.toString();
+}
+
+
+private String convertJsonPathToSql(String field) {
+
+    // Example:
+    // p.details.color → p.details->>'color'
+
+    if (field.contains(".")) {
+
+        String[] parts = field.split("\\.");
+
+        // normal column
+        if (parts.length == 2) {
+            return field;
+        }
+
+        // JSONB case
+        StringBuilder sql = new StringBuilder();
+        sql.append(parts[0]).append(".").append(parts[1]);
+
+        for (int i = 2; i < parts.length; i++) {
+            sql.append("->>'").append(parts[i]).append("'");
+        }
+
+        return sql.toString();
+    }
+
+    return field;
+}
+
+
+
