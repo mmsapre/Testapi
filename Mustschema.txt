@@ -1,0 +1,25 @@
+"MatchCondition": {
+  "type": "object",
+  "description": "Condition for matching fields using bool must",
+  "properties": {
+
+    "match": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "string"
+      }
+    },
+
+    "between": {
+      "type": "object",
+      "properties": {
+        "field": { "type": "string" },
+        "from": { "type": "string" },
+        "to": { "type": "string" }
+      }
+    }
+
+  },
+
+  "minProperties": 1
+}
