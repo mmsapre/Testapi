@@ -1,0 +1,56 @@
+flowchart TD
+
+A[Data Sources<br/>DB / Kafka / Files] --> B[Data Ingestion]
+
+B --> C[Field Extraction]
+C --> D[Semantic Classifier]
+C --> E[Tag Classifier]
+
+E --> F[JSON Rules Engine<br/>Sanction / License / Policy Rules]
+
+D --> G[Semantic Mapping]
+F --> H[Tag Enrichment]
+
+G --> I[Metadata Builder]
+H --> I
+
+I --> J[Persist to DB<br/>Postgres / BigQuery]
+
+J --> K[Sync to Cache Layer<br/>RocksDB / Hazelcast / Redis]
+
+K --> L[Ready for Runtime Lookup]
+
+
+
+
+
+flowchart TD
+
+A[API Request] --> B[Extract Request Facts<br/>URI + Method + Payload]
+
+B --> C[Fetch Metadata from Cache<br/>Tags + Semantics]
+
+C --> D[Subject Context<br/>JWT / X509]
+
+D --> E[Entitlement Check<br/>Platform + Entity]
+
+E -->|BLOCK / DENY| X[Stop Response]
+
+E -->|ALLOW| F[Intent Classification<br/>Why is data accessed?]
+
+F --> G[Policy Graph Evaluation<br/>Purpose → Field Access]
+
+G --> H{Confidence Check}
+
+H -->|High| I[Allow Response]
+H -->|Low| J[Obfuscate / Mask]
+
+I --> K[Audit Log]
+J --> K
+X --> K
+
+
+
+
+
+
