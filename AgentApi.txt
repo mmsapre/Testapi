@@ -1,0 +1,27 @@
+flowchart TD
+
+A[User Prompt / API Call] --> B[Agent Controller]
+
+B --> C[Lang4j Agent]
+
+C --> D[Task Identification]
+D --> D1[Extract Entities: table, columns, filters]
+D --> D2[Classify Intent: API_GEN / QUERY / UPDATE]
+D --> D3[Detect Requirements: JSONB, BETWEEN, JOIN]
+D --> D4[Validate Inputs: table exists?]
+
+D --> E[Plan Generation]
+
+E --> E1[Step 1: Fetch Metadata]
+E --> E2[Step 2: Generate YAML Config]
+E --> E3[Step 3: Build DSL Request]
+E --> E4[Step 4: Map JSON → SQL via ANTLR]
+E --> E5[Step 5: Validate Query]
+E --> E6[Step 6: Prepare Deployment Artifacts]
+E --> E7[Step 7: Mark Approval Required]
+
+E --> F[Tool Execution Layer]
+F --> G[Validator]
+G --> H[Human Approval]
+H --> I[Execution]
+I --> J[Response]
